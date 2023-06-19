@@ -1,10 +1,27 @@
 from sentence_transformers import SentenceTransformer, util
 
 # model paraphrase-MiniLM-L6-v2 
-# ordering according to score
 
-model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
 
+
+def calculate_score(user_text, reviews_of_POI): #reviews_of_POI: list of strings, the strings are reviews
+    model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
+    query_embedding = model.encode(user_text, convert_to_tensor=True)
+    passage_embedding = model.encode(reviews_of_POI, convert_to_tensor=True) #reviews_of_POI: list of strings, the strings are reviews
+    cosine_scores = util.cos_sim(query_embedding, passage_embedding)
+
+    list_of_scores = []
+
+    for i in range(len(cosine_scores[0])):
+        list_of_scores.append({'index': i, 'score': cosine_scores[0][i]})
+
+    # Sort scores in decreasing order
+    list_of_scores = sorted(list_of_scores, key=lambda x: x['score'], reverse=True)
+
+    return list_of_scores
+
+
+"""
 #text from user input
 user_text = 'I would like to go to Paris and visit the Eiffel tower. I am also interested in bridges, especially in evening hours since I enjoy watching the sunset. Moreover I am into classic architecture.'
 query_embedding = model.encode(user_text, convert_to_tensor=True)
@@ -42,3 +59,5 @@ print(list1)
 for score in list1[0:4]:
     i = score['index']
     print(f"user text \t\t sentence {i} \t\t Score: {score['score']}") #{score['score']}
+
+"""

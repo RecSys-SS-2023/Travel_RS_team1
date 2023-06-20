@@ -1,24 +1,46 @@
 from sentence_transformers import SentenceTransformer, util
+import json 
+import amsterdam.json, berlin.json, frankfurt.json, hamburg.json, istanbul.json, london.json, madrid.json, munich.json, paris.json, rome.json, vienna.json
+#read .json file to access the reviews by the POI_id
 
 # model paraphrase-MiniLM-L6-v2 
 
 
 
-def calculate_score(user_text, reviews_of_POI): #reviews_of_POI: list of strings, the strings are reviews
+def calculate_score(user_text, city=Berlin): 
     model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
     query_embedding = model.encode(user_text, convert_to_tensor=True)
-    passage_embedding = model.encode(reviews_of_POI, convert_to_tensor=True) #reviews_of_POI: list of strings, the strings are reviews
-    cosine_scores = util.cos_sim(query_embedding, passage_embedding)
 
-    list_of_scores = []
+    with open(city".json") as file:
+    data = json.load(file)
 
-    for i in range(len(cosine_scores[0])):
-        list_of_scores.append({'index': i, 'score': cosine_scores[0][i]})
+    with open("reviews_en.json") as file:
+    review_data = json.load(file)
 
-    # Sort scores in decreasing order
-    list_of_scores = sorted(list_of_scores, key=lambda x: x['score'], reverse=True)
+    #how do we get the number of POIs per city?
+    number_of_POIs_per_city = 
+    review_vector = 0
+    POIs_score = []
 
-    return list_of_scores
+    for n in range(number_of_POIs_per_city): #how many POIs per city do we have?
+        POI_id = data[n][place_id] #data is a dict
+        reviews_per_POI = #how many?
+
+        for r in range(reviews_per_POI): #how many scraper reviews per POI?
+            rev = review_data[POI_id]["scraper_reviews"][r][text] #get each review
+            passage_embedding = model.encode(rev, convert_to_tensor=True) 
+            review_vector += passage_embedding
+            review_vector_avg = review_vector/reviews_per_POI
+            score_per_POI = util.cos_sim(query_embedding, passage_embedding)
+        POIs_score.append(score_per_POI)
+    
+    return POIs_score #list of all POI_scores
+
+    
+
+    
+
+    return average_score_POI #return the average of the POI
 
 
 """
